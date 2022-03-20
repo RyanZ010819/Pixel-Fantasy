@@ -1,0 +1,8 @@
+﻿  Application.cpp
+C:\Users\16413\source\repos\Pixel Fantasy\Pixel Fantasy\Application.cpp(238,44): warning C4244: “=”: 从“int”转换到“float”，可能丢失数据
+C:\Users\16413\source\repos\Pixel Fantasy\Pixel Fantasy\Application.cpp(239,44): warning C4244: “=”: 从“int”转换到“float”，可能丢失数据
+C:\Users\16413\source\repos\Pixel Fantasy\Pixel Fantasy\Application.cpp(252,38): warning C4244: “=”: 从“int”转换到“float”，可能丢失数据
+C:\Users\16413\source\repos\Pixel Fantasy\Pixel Fantasy\Application.cpp(253,38): warning C4244: “=”: 从“int”转换到“float”，可能丢失数据
+  Main.cpp
+  正在生成代码...
+  Pixel Fantasy.vcxproj -> C:\Users\16413\source\repos\Pixel Fantasy\x64\Debug\Pixel Fantasy.exe
