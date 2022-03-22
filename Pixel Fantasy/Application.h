@@ -32,6 +32,7 @@ public:
 private:
     void handleEvents();
     void handleKeyBoardEvents(sf::Keyboard::Key e);
+    unsigned int loadCubemap(std::vector<std::string> faces);
 
     Context m_context;
     bool m_drag;

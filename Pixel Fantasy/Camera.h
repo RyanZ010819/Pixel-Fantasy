@@ -41,6 +41,8 @@ public:
     float MovementSpeed;
     float MouseSensitivity;
     float Zoom;
+    int m_windowWidth = 1280;
+    int m_windowHeight = 720;
 
     // constructor with vectors
     Camera(glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3 up = glm::vec3(0.0f, 1.0f, 0.0f), float yaw = YAW, float pitch = PITCH) : Front(glm::vec3(0.9f, -0.5f, 0.0f)), MovementSpeed(SPEED), MouseSensitivity(SENSITIVITY), Zoom(ZOOM)
@@ -65,6 +67,12 @@ public:
     glm::mat4 GetViewMatrix()
     {
         return glm::lookAt(Position, Position + Front, Up);
+    }
+
+    // returns the perspective projection matrix
+    glm::mat4 GetProjectionMatrix()
+    {
+        return glm::perspective(glm::radians(Zoom), (float) m_windowWidth / (float) m_windowHeight, 0.1f, 100.0f);
     }
 
     // processes input received from any keyboard-like input system. Accepts input parameter in the form of camera defined ENUM (to abstract it from windowing systems)

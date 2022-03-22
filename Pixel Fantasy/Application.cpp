@@ -17,6 +17,7 @@ Application::Application(const Config& config)
     : m_context(config)
     , m_drag(false)
     , m_config(config)
+    , m_skyboxRenderer()
 {
 }
 
@@ -38,61 +39,74 @@ void Application::runLoop()
     glEnable(GL_DEPTH_TEST);
     // glEnable(GL_CULL_FACE);
 
+    // configure global opengl state
+    // -----------------------------
+    glEnable(GL_DEPTH_TEST);
 
-    // build and compile our shader zprogram
-    // ------------------------------------
+    // build and compile shaders
+    // -------------------------
     Shader ourShader("../Shaders/vertexShader.vs", "../Shaders/fragmentShader.fs");
 
-    // set up vertex data (and buffer(s)) and configure vertex attributes
-    // ------------------------------------------------------------------
     float vertices[] = {
-         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
-          0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
-          0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-          0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-         -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 
-         -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-          0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-          0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-          0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-         -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
-         -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
 
-         -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-         -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-         -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-          0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-          0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-          0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-          0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-          0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-          0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
-         -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-          0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
-          0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-          0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-         -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-         -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
 
-         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
-          0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-          0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-          0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-         -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
-         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
-
-
+    // world space positions of our cubes
+    glm::vec3 cubePositions[] = {
+        glm::vec3(0.0f,  0.0f,  0.0f),
+        glm::vec3(2.0f,  5.0f, -15.0f),
+        glm::vec3(-1.5f, -2.2f, -2.5f),
+        glm::vec3(-3.8f, -2.0f, -12.3f),
+        glm::vec3(2.4f, -0.4f, -3.5f),
+        glm::vec3(-1.7f,  3.0f, -7.5f),
+        glm::vec3(1.3f, -2.0f, -2.5f),
+        glm::vec3(1.5f,  2.0f, -2.5f),
+        glm::vec3(1.5f,  0.2f, -1.5f),
+        glm::vec3(-1.3f,  1.0f, -1.5f)
+    };
     unsigned int VBO, VAO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
+
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -163,8 +177,8 @@ void Application::runLoop()
     ourShader.setInt("texture1", 0);
     ourShader.setInt("texture2", 1);
 
-    while (m_context.window.isOpen()) {
 
+    while (m_context.window.isOpen()) {
         // per-frame time logic
         // --------------------
         auto currentFrame = clock.getElapsedTime();
@@ -172,10 +186,11 @@ void Application::runLoop()
         lastFrame = currentFrame;
 
         handleEvents();
+
         // render
         // ------
-        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // also clear the depth buffer now!
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         // bind textures on corresponding texture units
         glActiveTexture(GL_TEXTURE0);
@@ -183,17 +198,16 @@ void Application::runLoop()
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
 
-        // render the triangle
+        // activate shader
         ourShader.use();
 
         // pass projection matrix to shader (note that in this case it could change every frame)
-        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)m_config.m_windowWidth/ (float)m_config.m_windowHeight, 0.1f, 100.0f);
+        glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float) camera.m_windowWidth / (float) camera.m_windowHeight, 0.1f, 100.0f);
         ourShader.setMat4("projection", projection);
 
         // camera/view transformation
         glm::mat4 view = camera.GetViewMatrix();
         ourShader.setMat4("view", view);
-
 
         // render boxes
         glBindVertexArray(VAO);
@@ -201,7 +215,7 @@ void Application::runLoop()
             for (int j = 0; j < MAP_SIZE; j++) {
                 // calculate the model matrix for each object and pass it to shader before drawing
                 glm::mat4 model = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
-                model = glm::translate(model, glm::vec3(static_cast<float>(i- MAP_SIZE / 2), -2.0f, static_cast<float>(j - MAP_SIZE / 2)));
+                model = glm::translate(model, glm::vec3(static_cast<float>(i - MAP_SIZE / 2), -2.0f, static_cast<float>(j - MAP_SIZE / 2)));
                 /*float angle = 20.0f * i;
                 model = glm::rotate(model, glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));*/
                 ourShader.setMat4("model", model);
@@ -210,12 +224,22 @@ void Application::runLoop()
             }
         }
 
-        m_skyboxRenderer.render();
+        m_skyboxRenderer.render(camera);
 
         m_context.window.display();
     }
 
+    
+
+    // optional: de-allocate all resources once they've outlived their purpose:
+    // ------------------------------------------------------------------------
+    /*glDeleteVertexArrays(1, &cubeVAO);
+    glDeleteVertexArrays(1, &skyboxVAO);
+    glDeleteBuffers(1, &cubeVBO);
+    glDeleteBuffers(1, &skyboxVBO);*/
+        m_context.window.display();
 }
+
 
 void Application::handleEvents()
 {
@@ -308,4 +332,36 @@ void Application::turnOffMouse()
 void Application::turnOnMouse()
 {
     m_context.window.setMouseCursorVisible(true);
+}
+
+unsigned int Application::loadCubemap(std::vector<std::string> faces)
+{
+    unsigned int textureID;
+    glGenTextures(1, &textureID);
+    glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+
+    int width, height, nrChannels;
+    for (unsigned int i = 0; i < faces.size(); i++)
+    {
+        unsigned char* data = stbi_load(faces[i].c_str(), &width, &height, &nrChannels, 0);
+        if (data)
+        {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i,
+                0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data
+            );
+            stbi_image_free(data);
+        }
+        else
+        {
+            std::cout << "Cubemap texture failed to load at path: " << faces[i] << std::endl;
+            stbi_image_free(data);
+        }
+    }
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    return textureID;
 }

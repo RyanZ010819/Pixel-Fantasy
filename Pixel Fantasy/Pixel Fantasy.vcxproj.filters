@@ -36,6 +36,9 @@
     <ClCompile Include="SkyboxRenderer.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="MasterRender.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Config.h">
@@ -60,6 +63,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="SkyboxRenderer.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="MasterRender.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>
