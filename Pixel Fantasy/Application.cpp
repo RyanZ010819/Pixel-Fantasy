@@ -18,6 +18,7 @@ Application::Application(const Config& config)
     , m_drag(false)
     , m_config(config)
     , m_skyboxRenderer()
+    , m_characterRenderer()
 {
 }
 
@@ -38,10 +39,8 @@ void Application::runLoop()
     // -----------------------------
     glEnable(GL_DEPTH_TEST);
     // glEnable(GL_CULL_FACE);
-
-    // configure global opengl state
-    // -----------------------------
-    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // build and compile shaders
     // -------------------------
@@ -90,9 +89,10 @@ void Application::runLoop()
         -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
         -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
     };
-    // world space positions of our cubes
-    glm::vec3 cubePositions[] = {
-        glm::vec3(0.0f,  0.0f,  0.0f),
+
+    // World space positions of our cubes. It has nothing to do with our program, so far.
+    /*glm::vec3 cubePositions[] = {
+        glm::vec3(0.10f,  0.0f,  0.0f),
         glm::vec3(2.0f,  5.0f, -15.0f),
         glm::vec3(-1.5f, -2.2f, -2.5f),
         glm::vec3(-3.8f, -2.0f, -12.3f),
@@ -102,7 +102,8 @@ void Application::runLoop()
         glm::vec3(1.5f,  2.0f, -2.5f),
         glm::vec3(1.5f,  0.2f, -1.5f),
         glm::vec3(-1.3f,  1.0f, -1.5f)
-    };
+    };*/
+
     unsigned int VBO, VAO;
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
@@ -189,15 +190,17 @@ void Application::runLoop()
 
         // render
         // ------
-        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+        
+        
         // bind textures on corresponding texture units
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1);
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, texture2);
-
+        
+       
         // activate shader
         ourShader.use();
 
@@ -209,7 +212,10 @@ void Application::runLoop()
         glm::mat4 view = camera.GetViewMatrix();
         ourShader.setMat4("view", view);
 
-        // render boxes
+        
+
+
+         //render boxes
         glBindVertexArray(VAO);
         for (int i = 0; i < MAP_SIZE; i++) {
             for (int j = 0; j < MAP_SIZE; j++) {
@@ -224,7 +230,14 @@ void Application::runLoop()
             }
         }
 
+
+        // The skybox needs to be rendered before character in order for the character's background color to be skybox
         m_skyboxRenderer.render(camera);
+       
+
+            std::vector<int> pos{ 0, 8, int(currentFrame.asSeconds() * 50) };
+            m_characterRenderer.render(camera, pos);
+        
 
         m_context.window.display();
     }
@@ -333,6 +346,10 @@ void Application::turnOnMouse()
 {
     m_context.window.setMouseCursorVisible(true);
 }
+
+
+
+
 
 unsigned int Application::loadCubemap(std::vector<std::string> faces)
 {

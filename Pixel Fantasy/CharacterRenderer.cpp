@@ -2,22 +2,24 @@
 
 unsigned int loadTexture();
 
+const int MAP_SIZE = 9;
+
 CharacterRenderer::CharacterRenderer() : m_shader("../Shaders/character.vs", "../Shaders/character.fs") {
 
     float characterVertices[] = {
         // positions          // texture Coords
         
 
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
-        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
-        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+        -0.3f,  0.3f,  0.3f,  1.0f, 0.0f,
+        -0.3f,  0.3f, -0.3f,  1.0f, 1.0f,
+        -0.3f, -0.3f, -0.3f,  0.0f, 1.0f,
+        -0.3f, -0.3f, -0.3f,  0.0f, 1.0f,
+        -0.3f, -0.3f,  0.3f,  0.0f, 0.0f,
+        -0.3f,  0.3f,  0.3f,  1.0f, 0.0f,
 
         
     };
-    
+
     // character VAO, VBO
     glGenVertexArrays(1, &m_characterVAO);
     glGenBuffers(1, &m_characterVBO);
@@ -44,7 +46,11 @@ CharacterRenderer::CharacterRenderer() : m_shader("../Shaders/character.vs", "..
 void CharacterRenderer::render(Camera& camera, std::vector<int> characterPosition) {
 
     m_shader.use();
+
+    
     glm::mat4 model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::vec3(static_cast<float>(characterPosition[0] - MAP_SIZE / 2), -1.0f, static_cast<float>(characterPosition[1] - MAP_SIZE / 2)));
+    model = glm::rotate(model, glm::radians(float(characterPosition[2])), glm::vec3(1,0,0));
     glm::mat4 view = camera.GetViewMatrix();
     glm::mat4 projection = camera.GetProjectionMatrix();
     m_shader.setMat4("model", model);
@@ -56,7 +62,7 @@ void CharacterRenderer::render(Camera& camera, std::vector<int> characterPositio
     glBindVertexArray(m_characterVAO);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, m_textureID);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+    glDrawArrays(GL_TRIANGLES, 0, 6);
     glBindVertexArray(0);
 }
 
