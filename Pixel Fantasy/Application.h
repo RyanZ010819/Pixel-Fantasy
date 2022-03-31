@@ -7,6 +7,7 @@
 #include "Context.h"
 #include "Shader.h"
 #include "SkyboxRenderer.h"
+#include "CharacterRenderer.h"
 #include <SFML/Window/Event.hpp>
 #include <glad/glad.h>
 #include <iostream>
@@ -38,7 +39,7 @@ private:
     bool m_drag;
     float m_lastX, m_lastY;
     SkyboxRenderer m_skyboxRenderer;
-
+    CharacterRenderer m_characterRenderer;
     const Config& m_config;
 };
 
